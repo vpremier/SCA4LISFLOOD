@@ -19,11 +19,11 @@ Import the time-series for the basin and insert the information.
 """
 
 # select the basin and the reference season
-basin = 'Umealven' 
-# hy_xxxx = 'hy1718'
+basin = 'Arve' 
+# hy_xxxx = 'hy2223'
 hy_xxxx = None
 
-input_dir = r'/mnt/CEPH_PROJECTS/PROSNOW/LISFLOOD/input_data'
+input_dir = os.getcwd()
 
 # output directory
 outdir = os.path.join(input_dir, basin, 'results')
@@ -36,7 +36,7 @@ if hy_xxxx:
     nc_name = os.path.join(path_scf , f'{basin}_{hy_xxxx}.nc')
     scf = xr.open_dataset(nc_name).SCF.load()
 else:
-    scf = xr.open_mfdataset(os.path.join(path_scf , f'{basin}_*.nc'))
+    scf = xr.open_mfdataset(os.path.join(path_scf , f'{basin}_*.nc')).SCF.load()
     
 scf = scf.transpose('time', 'lat', 'lon')
 scf = scf.sortby("time")
@@ -54,13 +54,14 @@ ta = open_ds(os.path.join(input_dir, basin), 'ta', 'ta6', date_start, date_end)
 
 # traditional snowmelt coefficient resulting from the hydrological calibration 
 # of the LISFLOOD model
-cm_l = open_ds(os.path.join(input_dir, basin), 'SnowMelt', 'SnowMeltCoef')
+cm_l = open_ds(os.path.join(input_dir, basin), 'SnowMeltCoef', 'SnowMeltCoef')
 
 
 # auxiliary information
 elvstd = open_ds(os.path.join(input_dir, basin), 'elvstd', 'Band1')
 forest = open_ds(os.path.join(input_dir, basin), 'fracforest', 'Band1')
-# elv = open_ds(os.path.join(os.getcwd(), basin), 'elv', 'Band1')
+# elv = open_ds(os.path.join(input_dir, basin), 'elv', 'Band1')
+# slope = open_ds(os.path.join(input_dir, basin), 'gradient', 'Band1')
 
 
 # snow and melt
@@ -108,7 +109,7 @@ A season (22/23) is left for evaluation purposes.
 # five seasons (17/18 - 21/22)  
 cm_folder = os.path.join(outdir, 'cm_eo1')
 cm_eo1_mean = get_mean_coeff(cm_folder, seasons, cm_l)
-cm_eo1_mean.to_netcdf(os.path.join(outdir, 'cm_eo1', f'{basin}_cm_eo1.nc'))
+# cm_eo1_mean.to_netcdf(os.path.join(outdir, 'cm_eo1', f'{basin}_cm_eo1.nc'))
 
 # where the coefficient was not computed (e.g., because of missing snow) replace
 # no data with the old coefficient
@@ -125,12 +126,12 @@ SCF. To convert SWE to SCF, we use two parametrization: i) Zaitchik and Rodell (
 and ii) Swenson et Lawrence (2012)
 """
 
-# compute the snow water equivalent with the old coefficient
-swe_l = compute_swe(snow, melt, cm_l).compute()
+# # compute the snow water equivalent with the old coefficient
+# swe_l = compute_swe(snow, melt, cm_l).compute()
 
-# conversion to scf
-scf_l_swenson = scf_param_swenson(swe_l, elvstd, kaccum_mean)
-scf_l_zaitchik = scf_param_zaitchik(swe_l, 4, forest) #Zaitchik and Rodell (2009)
+# # conversion to scf
+# scf_l_swenson = scf_param_swenson(swe_l, elvstd, kaccum_mean)
+# scf_l_zaitchik = scf_param_zaitchik(swe_l, 4, forest) #Zaitchik and Rodell (2009)
 
 
 
@@ -145,25 +146,25 @@ An average over 5 seasons (17/18 to 21/22) is then computed.
 A season (22/23) is left for evaluation purposes. 
 """
 
-# cm_folder = os.path.join(outdir, 'cm_eo2')
-# cm_eo2_mean = get_mean_coeff(cm_folder, seasons, cm_l)
+cm_folder = os.path.join(outdir, 'cm_eo2')
+cm_eo2_mean = get_mean_coeff(cm_folder, seasons, cm_l)
 # cm_eo2_mean.to_netcdf(os.path.join(outdir, 'cm_eo2', f'{basin}_cm_eo2.nc'))
 
-# # where the coefficient was not computed (e.g., because of missing snow) replace
-# # no data with the old coefficient
-# cm_eo2_mean_filled = cm_eo2_mean.fillna(cm_l)
-
+# where the coefficient was not computed (e.g., because of missing snow) replace
+# no data with the old coefficient
+cm_eo2_mean_filled = cm_eo2_mean.fillna(cm_l)
 
 
 #%%
 """
 Compute SWE and SCF (with the desired parametrization) with the new coefficients.
 """
-# swe_eo1 = compute_swe(snow, melt, cm_eo1_mean_filled).compute()
-# scf_eo1 =  scf_param_swenson(swe_eo1, elvstd, kaccum_mean)
 
-# swe_eo2 = compute_swe(snow, melt, cm_eo2_mean_filled).compute()
-# scf_eo2 =  scf_param_swenson(swe_eo2, elvstd, kaccum_mean)
+swe_eo1 = compute_swe(snow, melt, cm_eo1_mean_filled).compute()
+scf_eo1 =  scf_param_swenson(swe_eo1, elvstd, kaccum_mean)
+
+swe_eo2 = compute_swe(snow, melt, cm_eo2_mean_filled).compute()
+scf_eo2 =  scf_param_swenson(swe_eo2, elvstd, kaccum_mean)
 
 
 #%%
@@ -188,22 +189,28 @@ LISFLOOD (on the left), EO data via Pistocchi et al., 2017 (in the middle),
 and EO data through the optimization approach (on the right). 
 The corresponding histograms are also included.
 """
-plot_sca(basin, scf, scf_l_swenson, scf_eo1, scf_eo2, cm_l)
+
+# Compute the mean along 'time'
+mean_scf = scf.mean(dim='time').values  # Convert to NumPy array
+
+# Create a mask: True where valid (not NaN), False where invalid (NaN)
+mask = np.isnan(mean_scf)
+
+plot_sca(basin, scf, scf_l_swenson, scf_eo1, scf_eo2, mask)
 # plt.savefig(os.path.join(outdir, f'SCA_{basin}.png'))
 
 """
 Compute BIAS, RMSE and correlation
 """
-
 print('Metrics with the parametrization of Swenson and Lawrance (2012)')
-print_metrics(scf_l_swenson, scf.SCF, cm_l)
+print_metrics(scf_l_swenson, scf, mask)
 
 print('Metrics with the parametrization of Zaitchik and Rodell (2009)')
-print_metrics(scf_l_zaitchik, scf.SCF, cm_l)
+print_metrics(scf_l_zaitchik, scf, mask)
 
 print('Metrics with the EO snowmelt coefficient obtained with Pistocchi et al. (2017)')
-print_metrics(scf_eo1, scf.SCF, cm_l)
+print_metrics(scf_eo1, scf, mask)
 
 print('Metrics with the novel optimization method')
-print_metrics(scf_eo2, scf.SCF, cm_l)
+print_metrics(scf_eo2, scf, mask)
 

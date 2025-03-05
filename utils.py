@@ -79,7 +79,7 @@ def open_ds(dirname, varname, dsname, date_start=None, date_end=None):
         var = xr.open_mfdataset(os.path.join(dir_forcings, varname + '*.nc'))
         
     else:
-        var = xr.open_mfdataset(os.path.join(dir_parameters, varname + '*.nc'))
+        var = xr.open_mfdataset(os.path.join(dir_parameters, varname + '.nc'))
 
     # Apply the mask where 'area' equals 1
     if "area" in mask.data_vars:

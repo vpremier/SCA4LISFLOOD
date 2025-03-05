@@ -22,8 +22,8 @@ Import the time-series for the basin and insert the information.
 """
 
 # select the basin and the reference season
-basin = 'Salzach' 
-hy_xxxx = 'hy1819'
+basin = 'Adige' 
+hy_xxxx = 'hy2122'
 
 input_dir = r'/mnt/CEPH_PROJECTS/PROSNOW/LISFLOOD/input_data'
 

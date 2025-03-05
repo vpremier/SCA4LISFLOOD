@@ -203,7 +203,7 @@ def get_sca(scf, mask):
 
 
 
-def plot_sca(basin, scf, scf_l, scf_eo1, scf_eo2, cm_l):
+def plot_sca(basin, scf, scf_l, scf_eo1, scf_eo2, mask):
     """
     Plots the Snow Cover Area (SCA) over time for the EO dataset and LISFLOOD 
     withe the different snowmelt coefficient.
@@ -249,9 +249,6 @@ def plot_sca(basin, scf, scf_l, scf_eo1, scf_eo2, cm_l):
     
     colors = ['black', '#56B4E9', '#D55E00', '#009E73']  # These are colorblind-friendly colors (from the CUD palette)
 
-
-    # get the mask
-    mask = np.isnan(cm_l.values)
     
     # get the snow cover area (SCA) over the masked area
     sca_eo = get_sca(scf, mask) # EO benchmark
@@ -263,7 +260,7 @@ def plot_sca(basin, scf, scf_l, scf_eo1, scf_eo2, cm_l):
 
     # create the figure 
     plt.figure(figsize=(24, 3))
-    plt.plot(scf.time, sca_eo.SCF.values, label='EO-SCA', color=colors[0], linewidth=1, linestyle='-')
+    plt.plot(scf.time, sca_eo.values, label='EO-SCA', color=colors[0], linewidth=1, linestyle='-')
     plt.plot(scf.time, sca_l.values, label ='L-SCA L-C$_{m}$', color=colors[1], linewidth=1, linestyle='-')
     plt.plot(scf.time, sca_eo_cm1.values, label ='L-SCA EO-C$_{m,1}$', color=colors[3], linewidth=1, linestyle='-')
     plt.plot(scf.time, sca_eo_cm2.values, label ='L-SCA EO-C$_{m,2}$', color=colors[2], linewidth=1, linestyle='-')
@@ -353,8 +350,7 @@ def compute_pixelwise_statistics(modelled, target, mask):
 
 
 
-def print_metrics(modelled, target, cm_l):
-    mask = np.isnan(cm_l.values)
+def print_metrics(modelled, target, mask):
     
     bias, rmse, corr = compute_pixelwise_statistics(modelled, target, mask)  
     
