@@ -26,12 +26,6 @@ For other basins, refer to the following links:
 
 For any questions or inquiries, please contact:
 
-- **Name**: Valentina Premier
-- **Email**: valentina.premier@eurac.edu
-- **Organization**: Eurac Research
+- Valentina Premier, Eurac Research, valentina.premier@eurac.edu
+- Francesca Moschini, European Commission, Joint Research Centre (JRC), francesca.moschini@ec.europa.eu
 
-
-
-- **Name**: Francesca Moschini
-- **Email**: francesca.moschini@ec.europa.eu
-- **Organization**: European Commission, Joint Research Centre (JRC)
