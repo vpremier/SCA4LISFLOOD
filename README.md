@@ -26,7 +26,10 @@ For other basins, refer to the following links:
 
 For any questions or inquiries, please contact:
 
-- **Name**: [Valentina Premier]
-- **Email**: [valentina.premier@eurac.edu]
-- **Organization**: [Eurac Research]
-- **GitHub**: [Your GitHub Profile](https://github.com/vpremier)
+- **Name**: Valentina Premier
+- **Email**: valentina.premier@eurac.edu
+- **Organization**: Eurac Research
+
+- **Name**: Francesca Moschini
+- **Email**: francesca.moschini@ec.europa.eu
+- **Organization**: European Commission, Joint Research Centre (JRC)
