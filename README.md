@@ -1,6 +1,23 @@
-# SCA4LISFLOOD
+# SCA4LISFLOOD: Snow Module Evaluation for LISFLOOD
 
-These scripts are used to evaluate the snow module of LISFLOOD and derive a snowmelt coefficient based on Earth Observation (EO) data. In detail, the code:
-- reproduces the LISFLOOD snow module; 
-- implements two snow cover fraction parametrizations (Zaitchik and Rodell, 2009 and Swenson et Lawrence, 2012) to convert the Snow Water Equivalent (SWE) in Snow Cover Fraction (SCF);
-- implements two methods to derive the Snowmelt Coefficient (Cm) - the first based on the number of snow covered days (Pistocchi et al., 2017) and the second based on an optimization that minimizes the error between the modelled and observed SCF.
+This repository contains scripts used to evaluate the snow module of LISFLOOD and derive a snowmelt coefficient based on Earth Observation (EO) data. Specifically, the code:
+
+- Reproduces the LISFLOOD snow module (see [LISFLOOD GitHub](https://github.com/ec-jrc/lisflood-code)).
+- Implements two snow cover fraction parameterizations (Zaitchik and Rodell, 2009, and Swenson & Lawrence, 2012) to convert Snow Water Equivalent (SWE) into Snow Cover Fraction (SCF).
+- Implements two methods to derive the Snowmelt Coefficient (Cm):  
+    - The first method is based on the number of snow-covered days (Pistocchi et al., 2017).
+    - The second method is an optimization approach that minimizes the error between modeled and observed SCF.
+
+### Main Scripts
+
+- **`main.py`**: Used to reproduce the SWE and SCF.
+- **`optimization.py`**: Used for deriving the snowmelt coefficient through the optimization approach.
+
+### Folder Structure
+
+- **`Arve/`**: Contains input and output data for running the example.  
+For other basins, refer to the following links:
+    - LISFLOOD parameters: [LISFLOOD Static and Parameter Maps for EFAS](https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/LISFLOOD_static_and_parameter_maps_for_EFAS/)
+    - Meteorological forcings: [CEMS-EFAS Meteorological Forcings](https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/meteorological_forcings/)
+    - Snow cover fraction time-series: [Zenodo Snow Cover Fraction Data](https://zenodo.org/records/14961639)
+
