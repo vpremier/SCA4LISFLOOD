@@ -21,3 +21,12 @@ For other basins, refer to the following links:
     - Meteorological forcings: [CEMS-EFAS Meteorological Forcings](https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/meteorological_forcings/)
     - Snow cover fraction time-series: [Zenodo Snow Cover Fraction Data](https://zenodo.org/records/14961639)
 
+
+### Contact Information
+
+For any questions or inquiries, please contact:
+
+- **Name**: [Valentina Premier]
+- **Email**: [valentina.premier@eurac.edu]
+- **Organization**: [Eurac Research]
+- **GitHub**: [Your GitHub Profile](https://github.com/vpremier)
