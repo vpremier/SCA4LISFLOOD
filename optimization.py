@@ -22,13 +22,13 @@ Import the time-series for the basin and insert the information.
 """
 
 # select the basin and the reference season
-basin = 'Adige' 
-hy_xxxx = 'hy2122'
+basin = 'Alpenrhein' 
+hy_xxxx = 'hy1718'
 
 input_dir = r'/mnt/CEPH_PROJECTS/PROSNOW/LISFLOOD/input_data'
 
 # output directory
-outdir = os.path.join(input_dir, basin, 'results')
+outdir = os.path.join(input_dir, basin, 'results_im')
 
 # paths to the time-series of sca
 path_scf = os.path.join(input_dir, basin, 'SCF')
@@ -54,7 +54,7 @@ ta = open_ds(os.path.join(input_dir, basin), 'ta', 'ta6', date_start, date_end)
 # traditional snowmelt coefficient resulting from the hydrological calibration 
 # of the LISFLOOD model
 
-cm_l = open_ds(os.path.join(input_dir, basin), 'SnowMelt', 'SnowMeltCoef')
+cm_l = open_ds(os.path.join(input_dir, basin), 'SnowMeltCoef', 'SnowMeltCoef')
 
 
 
@@ -224,7 +224,7 @@ optimized_cm.attrs = {
     "long_name": "SnowMeltCoef",
     "units": "mm/(°C day)",
     "description": "Snowmelt coefficient estimated based on EO snow cover fraction data.",
-    "reference": "Premier, V., Moschini, F., Casado-Rodríguez, J., Bavera, D., Marin, C., Pistocchi, A., (in preparation). Technical note: Assessing the Impact of Earth Observation Data-Driven Calibration of the Melting Coefficient on the LISFLOOD Snow Module."
+    "reference": "Premier, V., Moschini, F., Casado-Rodríguez, J., Bavera, D., Marin, C., Pistocchi, A., (in preparation). Assessing the Impact of Earth Observation Data-Driven Calibration of the Melting Coefficient on the LISFLOOD Snow Module."
 }
 
     

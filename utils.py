@@ -213,7 +213,50 @@ def get_snow_melt(pr, ta, elvstd, SnowFactor=1, TempSnow=1, TempMelt=1, delta_t=
 
 
 
-def compute_swe(snow, melt, cm):
+def get_ice_melt(ta, delta_t=1):
+    """
+    Compute a simple ice melt index based on seasonal variability and temperature.
+
+    The function applies a sinusoidal melt coefficient (Cim) that varies seasonally 
+    between June 13 and September 13. Outside this period, melt is set to zero. 
+    The melt index is then scaled by air temperature.
+
+    Parameters
+    ----------
+    ta : xarray.DataArray
+        Daily air temperature (°C).
+    delta_t : float, optional
+        Time step for the melt calculation. Default is 1.
+
+    Returns
+    -------
+    xr.DataArray
+        Ice melt index with the same dimensions and coordinates as `ta`. 
+        Values are zero outside the defined melt season.
+    """
+    
+    
+    # Compute day-of-year (DOY) in a vectorized manner
+    doy = ta['time'].dt.dayofyear
+    
+    # Define DOY for ice melt season start and end
+    start = pd.Timestamp("2000-06-13").dayofyear  
+    end = pd.Timestamp("2000-09-13").dayofyear    
+ 
+    # Seasonally-varying icemelt coefficent
+    Cim = 7 * np.sin((doy - start) * 4*np.pi/365.25)
+    
+    # Replace with 0 if outside melt season
+    Cim = xr.where((doy > start) & (doy < end), Cim, 0)
+    
+
+    ice_melt = Cim * ta * delta_t
+        
+    return ice_melt
+
+
+    
+def compute_swe(snow, melt, ice_melt, cm):
     """
     Computes Snow Water Equivalent (SWE) based on snowfall, melt, and a melt coefficient.
     The approach reproduces the snow module of LISFLOOD and is described here
@@ -225,6 +268,8 @@ def compute_swe(snow, melt, cm):
         Snowfall accumulation over time.
     melt : xarray.DataArray
         Melt potential over time.
+    ice_melt : xarray.DataArray
+        Ice melt over time.
     cm : xarray.DataArray
         Melt coefficient, can be spatially varying.
 
@@ -248,10 +293,13 @@ def compute_swe(snow, melt, cm):
 
     # Precompute seasonal coefficient (c_seas) for each day
     c_seas = 0.5 * np.sin((2 * np.pi / 365.25) * (doy - 81))
+    
+    
 
     # Iterate through time steps (starting from 1 to avoid first-step issue)
     for i in range(1, len(melt.time)):
-        swe_array[i] = swe_array[i - 1] + snow_array[i] - (cm_array + c_seas[i]) * melt_array[i]
+        swe_array[i] = swe_array[i - 1] + snow_array[i] - \
+                        (cm_array + c_seas[i]) * melt_array[i] - ice_melt[i] 
         swe_array[i] = np.maximum(swe_array[i], 0)  # Ensure SWE is non-negative
     
     # Assign computed values back to xarray structure
@@ -267,7 +315,7 @@ def compute_swe(snow, melt, cm):
 
 
 
-def get_eo_cm(scf, snow, melt):
+def get_eo_cm(scf, snow, melt, ice_melt):
     """
     Computes the snowmelt coefficient (cm) based on snow, melt, and 
     snow-covered area (SCA), following the approach by Pistocchi et al., 2017
@@ -302,7 +350,7 @@ def get_eo_cm(scf, snow, melt):
     c_seas = 0.5 * np.sin((2 * np.pi / 365.25) * (doy - 81))
 
     # Perform time aggregation using xarray operations
-    cm = ((snow * scf_binary).sum('time') - \
+    cm = ((snow * scf_binary).sum('time') - (ice_melt * scf_binary).sum('time') -\
               (c_seas * melt * scf_binary).sum('time')) / ((melt * scf_binary).sum('time'))
 
     # Set variable name and attributes
